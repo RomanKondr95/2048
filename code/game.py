@@ -1,5 +1,19 @@
-from random import random
+from random import *
+import pygame
+import sys
+
+
 mas = [[0] * 4 for i in range(4)]
+WHITE = (255,255,255)
+SILVER =(192,192,192)
+
+block = 4
+size_block = 110
+margin = 10
+widht = block * size_block + (block + 1) * margin
+height = widht + 110
+title_rec = pygame.Rect(0,0,widht,110)
+
 
 def pretty_mas(mas)->list:
     print('-'*10)
@@ -23,7 +37,7 @@ def get_ind_from_num(num)->int:
     x,y = num//4,num%4
     return x,y
 
-def two_or_four(mas,x,y):
+def two_or_four(mas,x,y)->list:
     """
     функция подставляет рандомно 2 или 4
     
@@ -44,8 +58,49 @@ def get_empty_list(mas)->list:
                        empty.append(num)
         return empty
 
+def is_zero(mas)->bool:
+    """
+    функция проверяет есть ли нули в массиве
+
+    """
+    for row in mas:
+        if 0 in row:
+            return True
+    return False 
+    
 
 mas[1][2] = 2
 mas[3][0] = 4
-# print(pretty_mas(mas))
-# print(get_empty_list(mas))
+
+pygame.init()
+screen = pygame.display.set_mode((widht,height))
+pygame.display.set_caption('2048')
+
+
+while is_zero(mas):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit(0)
+        elif event.type == pygame.KEYDOWN:
+            pygame.draw.rect(screen,WHITE,title_rec)
+            for row in range(block):
+                for col in range(block):
+                    x = col * size_block + (col+1) * margin
+                    y = row * size_block + (row+1) * margin + 110
+                    pygame.draw.rect(screen,SILVER,(x,y,110,110))
+            empty = get_empty_list(mas)
+            shuffle(empty)
+            num = empty.pop()
+            x,y = get_ind_from_num(num)
+            mas = two_or_four(mas,x,y)
+            pretty_mas(mas)
+    pygame.display.update()
+
+
+
+               
+               
+     
+
+

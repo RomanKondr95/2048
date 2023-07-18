@@ -1,4 +1,4 @@
-from game import get_num_from_ind, get_empty_list,get_ind_from_num
+from game import get_empty_list,get_ind_from_num,get_num_from_ind,is_zero
 import unittest
 class Test_2048(unittest.TestCase):
     def test_1(self):
@@ -23,8 +23,24 @@ class Test_2048(unittest.TestCase):
         self.assertEqual(get_empty_list(mas),a)
     def test_6(self):
         self.assertEqual(get_ind_from_num(7),(1,2))
-    def test_6(self):
+    def test_7(self):
         self.assertEqual(get_ind_from_num(16),(3,3))
+    
+    def test_8(self):
+        mas = [[1,1,1,1],
+               [1,1,1,1],
+               [1,1,1,1],
+               [1,1,1,1]
+        ]
+        self.assertEqual(is_zero(mas),False)
+    
+    def test_9(self):
+        mas = [[1,1,1,1],
+               [1,0,1,1],
+               [1,1,1,1],
+               [1,1,1,1]
+        ]
+        self.assertEqual(is_zero(mas),True)
 
 
 if __name__ == '__main__':
