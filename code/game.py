@@ -1,6 +1,22 @@
 from random import *
 import pygame
 import sys
+from database import get_best,cur
+
+GAMERS_DB = get_best()
+
+def drawing_top():
+    font_top = pygame.font.SysFont('stxingkai',30)
+    font_gamer = pygame.font.SysFont('arial',20)
+    text_head = font_top.render('Best tries: ', True, BLACK)
+    screen.blit(text_head, (350,5))
+    for index, gamer in enumerate(GAMERS_DB):
+        name, score = gamer
+        s = f'{index+1}. {name} - {score}'
+        text_gamer = font_gamer.render(s, True, BLACK)
+        screen.blit(text_gamer, (350, 33 + 20 * index))
+    
+
 
 def drawing_interface(score):
     """
@@ -13,8 +29,9 @@ def drawing_interface(score):
     text_score = font_score.render('Score: ', True, BLACK)
     text_score_value = font_score.render(f'{score}', True, BLACK)
     screen.blit(text_score,(20,35))
-    screen.blit(text_score_value,(250,35))
+    screen.blit(text_score_value,(200,35))
     pretty_mas(mas)
+    drawing_top()
     for row in range(block):
         for col in range(block):
             value = mas[row][col]
