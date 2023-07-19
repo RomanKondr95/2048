@@ -43,7 +43,7 @@ class Test_2048(unittest.TestCase):
         self.assertEqual(is_zero(mas),True)
 
 
-def test_10(self):
+    def test_10(self):
         mas = [[2,2,0,0],
                [0,4,4,0],
                [0,0,0,0],
@@ -55,9 +55,9 @@ def test_10(self):
                [0,0,0,0]
         ]
 
-        self.assertEqual(move_left(mas),res)
+        self.assertEqual(move_left(mas),(res, 12))
 
-def test_11(self):
+    def test_11(self):
         mas = [[2,4,4,2],
                [4,0,0,2],
                [0,0,0,0],
@@ -69,7 +69,42 @@ def test_11(self):
                [16,8,0,0]
         ]
 
-        self.assertEqual(move_left(mas),res)
+        self.assertEqual(move_left(mas),(res, 32))
+
+    def test_12(self):
+        mas = [[2,2,2,4],
+               [2,0,0,0],
+               [4,0,0,4],
+               [4,2,4,0]
+        ]
+        res = [[4,4,2,8],
+               [8,0,4,0],
+               [0,0,0,0],
+               [0,0,0,0]
+        ]
+
+        self.assertEqual(move_up(mas),(res, 24))
+
+    
+    def test_13(self):
+        mas = [[2,2,2,4],
+               [2,0,0,0],
+               [4,0,0,4],
+               [4,2,4,0]
+        ]
+        
+        self.assertEqual(is_can_move(mas),True)
+
+    def test_14(self):
+        mas = [[2,4,8,16],
+               [256,128,64,32],
+               [512,1024,2048,4],
+               [8,2,32,64]
+        ]
+        
+        self.assertEqual(is_can_move(mas),False)
+    
+    
 
 
 
