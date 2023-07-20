@@ -2,6 +2,7 @@ from random import *
 import pygame
 import sys
 from database import get_best,cur,insert_res
+from functions import *
 
 GAMERS_DB = get_best()
 USERNAME = None
@@ -46,8 +47,27 @@ def drawing_interface(score):
                 text_y = y + (size_block - font_h) / 2
                 screen.blit(text,(text_x,text_y))
 
+def init_const():
+    """
+    функция инициализирует константы
 
-mas = [[0] * 4 for i in range(4)]
+    """
+    global score,mas
+    mas = [[0] * 4 for i in range(4)]
+
+    empty = get_empty_list(mas)
+    shuffle(empty)
+    num1 = empty.pop()
+    num2 = empty.pop()
+    x1,y1 = get_ind_from_num(num1)
+    mas = two_or_four(mas,x1,y1)
+    x2,y2 = get_ind_from_num(num2)
+    mas = two_or_four(mas,x2,y2)
+    score = 0
+
+mas = None
+score = None
+init_const()
 SILVER =(192,192,192)
 BLACK = (0,0,0)
 COLORS = {
@@ -71,165 +91,12 @@ margin = 10
 widht = block * size_block + (block + 1) * margin
 height = widht + 110
 title_rec = pygame.Rect(0,0,widht,110)
-score = 0
-
 
 def pretty_mas(mas)->list:
     print('-'*10)
     for row in mas:
         print(*row)
     print('-'*10)
-
-def get_num_from_ind(i,j) -> int:
-    """
-    функция получает число по индексу массива
-
-    """
-    return i * 4 + j+ 1
-
-def get_ind_from_num(num)->int:
-    """
-    функция получает индекс массива по числу
-
-    """
-    num-=1
-    x,y = num//4,num%4
-    return x,y
-
-def two_or_four(mas,x,y)->list:
-    """
-    функция подставляет рандомно 2 или 4
-    
-    """
-    if random() <= 0.75:
-        mas[x][y] = 2
-    else:
-        mas[x][y] = 4
-    return mas
-
-     
-def get_empty_list(mas)->list:
-        empty = []
-        for row in range(4):
-             for col in range(4):
-                  if mas[row][col] == 0:
-                       num = get_num_from_ind(row,col)
-                       empty.append(num)
-        return empty
-
-def is_zero(mas)->bool:
-    """
-    функция проверяет есть ли нули в массиве
-
-    """
-    for row in mas:
-        if 0 in row:
-            return True
-    return False 
-
-def move_left(mas):
-    """
-    функция обрабатывает движение влево
-
-    """
-    count = 0
-    for row in mas:
-        while 0 in row:
-            row.remove(0)
-        while len(row) != 4:
-            row.append(0)
-    for i in range(4):
-        for j in range(3):
-            if mas[i][j] == mas[i][j+1] and mas[i][j] != 0:
-                mas[i][j] *= 2
-                count += mas[i][j]
-                mas[i].pop(j+1)
-                mas[i].append(0)
-    return mas,count
-
-def move_right(mas):
-    """
-    функция обрабатывает движение вправо
-
-    """
-    count = 0
-    for row in mas:
-        while 0 in row:
-            row.remove(0)
-        while len(row) != 4:
-            row.insert(0,0)
-    for i in range(4):
-        for j in range(3,0,-1):
-            if mas[i][j] == mas[i][j-1] and mas[i][j] != 0:
-                mas[i][j] *= 2
-                count += mas[i][j]
-                mas[i].pop(j-1)
-                mas[i].insert(0,0)
-    return mas,count
-
-def move_up(mas):
-    """
-    функция обрабатывает движение вверх
-
-    """
-    count = 0
-    for j in range(4):
-        col = []
-        for i in range(4):
-            if mas[i][j] != 0:
-                col.append(mas[i][j])
-        while len(col) != 4:
-            col.append(0)
-        for i in range(3):
-            if col[i] == col[i+1] and col[i] != 0:
-                col[i] *=2
-                count += col[i]
-                col.pop(i+1)
-                col.append(0)
-        for i in range(4):
-            mas[i][j] = col[i]
-    return mas,count
-
-def move_down(mas):
-    """
-    функция обрабатывает движение вниз
-
-    """
-    count = 0
-    for j in range(4):
-        col = []
-        for i in range(4):
-            if mas[i][j] != 0:
-                col.append(mas[i][j])
-        while len(col) != 4:
-            col.insert(0,0)
-        for i in range(3,0,-1):
-            if col[i] == col[i-1] and col[i] != 0:
-                col[i] *=2
-                count += col[i]
-                col.pop(i-1)
-                col.insert(0,0)
-        for i in range(4):
-            mas[i][j] = col[i]
-    return mas,count
-
-def is_can_move(mas):
-    """
-    функция проверяет возможно ли движение
-    """
-    for i in range(3):
-        for j in range(3):
-            if mas[i][j] == mas[i][j+1] or mas[i][j] == mas[i+1][j] or mas[i][j] == mas[i][j-1] or mas[i][j] == mas[i-1][j]:
-                return True
-    return False
-
-
-
-
-    
-
-mas[1][2] = 2
-mas[3][0] = 4
 
 pygame.init()
 screen = pygame.display.set_mode((widht,height))
@@ -283,6 +150,7 @@ def drawing_game_over():
     функция обрабатывает конечную звставку
 
     """
+    global USERNAME
     img = pygame.image.load('img.jpg')
     font_game_over = pygame.font.SysFont('stxingkai',50)
     font_score = pygame.font.SysFont('arial',50)
@@ -295,50 +163,66 @@ def drawing_game_over():
         text = f'Record still {best_score}'
     text_record = font_score.render(text,True,(255, 165, 0))
     insert_res(USERNAME,score)    
-
-    while True:
+    desicion = False
+    while not desicion:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit(0)
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    USERNAME = None
+                    desicion = True
+                    init_const()
+                elif event.key == pygame.K_SPACE:
+                    desicion = True
+                    init_const()
+
         screen.fill(BLACK)
         screen.blit(text_game_over,(230,80))
         screen.blit(pygame.transform.scale(img,[210,210]),[5,5])
         screen.blit(text_score,(30,250))
         screen.blit(text_record, (30,300))
         pygame.display.update()
+    screen.fill(BLACK)
+def game_loop():
+    """
+    функция объединяет в себе весь игровой процесс
+    """
+    global score,mas
+    drawing_interface(score)
+    pygame.display.update()
+    while is_zero(mas) and is_can_move(mas):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit(0)
+            elif event.type == pygame.KEYDOWN:
+                count = 0
+                if event.key == pygame.K_LEFT:
+                    mas,count = move_left(mas)
+                elif event.key == pygame.K_RIGHT:
+                    mas,count = move_right(mas)
+                elif event.key == pygame.K_UP:
+                    mas,count = move_up(mas)
+                elif event.key == pygame.K_DOWN:
+                    mas,count = move_down(mas)
+                score += count
+                if is_zero(mas):
+                    empty = get_empty_list(mas)
+                    shuffle(empty)
+                    num = empty.pop()
+                    x,y = get_ind_from_num(num)
+                    mas = two_or_four(mas,x,y)
+                    drawing_interface(score)
+                pygame.display.update()
+        print(USERNAME)
 
-
-drawing_intro()
-drawing_interface(score)
-pygame.display.update()
-while is_zero(mas) and is_can_move(mas):
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit(0)
-        elif event.type == pygame.KEYDOWN:
-            count = 0
-            if event.key == pygame.K_LEFT:
-                mas,count = move_left(mas)
-            elif event.key == pygame.K_RIGHT:
-                mas,count = move_right(mas)
-            elif event.key == pygame.K_UP:
-                mas,count = move_up(mas)
-            elif event.key == pygame.K_DOWN:
-                mas,count = move_down(mas)
-            score += count
-            if is_zero(mas):
-                empty = get_empty_list(mas)
-                shuffle(empty)
-                num = empty.pop()
-                x,y = get_ind_from_num(num)
-                mas = two_or_four(mas,x,y)
-                drawing_interface(score)
-            pygame.display.update()
-    print(USERNAME)
-
-drawing_game_over()
+while True:
+    if USERNAME == None:
+        drawing_intro()
+    game_loop()
+    drawing_game_over()
 
 
 
