@@ -9,6 +9,12 @@ create table if not exists RECORDS (
 )
             """)
 
+def insert_res(name, score):
+    cur.execute("""
+    insert into RECORDS values (?, ?)
+                """, (name, score))
+    bd.commit()
+
 def get_best():
     cur.execute("""
     SELECT name, max(score) score from RECORDS
@@ -17,4 +23,5 @@ def get_best():
     limit 3
     """)
     return cur.fetchall()
+
 

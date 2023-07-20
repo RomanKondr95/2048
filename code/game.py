@@ -1,9 +1,10 @@
 from random import *
 import pygame
 import sys
-from database import get_best,cur
+from database import get_best,cur,insert_res
 
 GAMERS_DB = get_best()
+USERNAME = None
 
 def drawing_top():
     font_top = pygame.font.SysFont('stxingkai',30)
@@ -234,6 +235,81 @@ pygame.init()
 screen = pygame.display.set_mode((widht,height))
 pygame.display.set_caption('2048')
 
+def drawing_intro():
+    """
+    функция обрабатывает заставку игры
+
+    """
+    img = pygame.image.load('images.jpg')
+    font_welcome = pygame.font.SysFont('stxingkai',50)
+    font_name = pygame.font.SysFont('arial',50)
+    text_welcome = font_welcome.render('WELCOME!',True,(255,0,0))
+    name = 'Enter your name'
+    is_find_name = False
+    while not is_find_name:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit(0)
+            elif event.type == pygame.KEYDOWN:
+                if event.unicode.isalpha():
+                    if name == 'Enter your name':
+                        name = event.unicode
+                    else:
+                        name += event.unicode
+                elif event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+                elif event.key == pygame.K_RETURN:
+                    if len(name) > 2:
+                        global USERNAME
+                        USERNAME = name
+                        is_find_name = True
+                        break
+    
+
+        screen.fill(BLACK)
+        text_name = font_name.render(name,True,(255,255,255))
+        rect_name = text_name.get_rect()
+        rect_name.center = screen.get_rect().center
+        screen.blit(pygame.transform.scale(img,[210,210]),[5,5])
+        screen.blit(text_welcome,(230,80))
+        screen.blit(text_name,rect_name)
+        pygame.display.update()
+    screen.fill(BLACK)
+
+
+def drawing_game_over():
+    """
+    функция обрабатывает конечную звставку
+
+    """
+    img = pygame.image.load('img.jpg')
+    font_game_over = pygame.font.SysFont('stxingkai',50)
+    font_score = pygame.font.SysFont('arial',50)
+    text_game_over = font_game_over.render('Fucking loser!', True, (255,0,0))
+    text_score = font_score.render(f'Your score: {score}', True, (255,255,255))
+    best_score = GAMERS_DB[0][1]
+    if score > best_score:
+        text = f'New Record'
+    else:
+        text = f'Record still {best_score}'
+    text_record = font_score.render(text,True,(255, 165, 0))
+    insert_res(USERNAME,score)    
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit(0)
+        screen.fill(BLACK)
+        screen.blit(text_game_over,(230,80))
+        screen.blit(pygame.transform.scale(img,[210,210]),[5,5])
+        screen.blit(text_score,(30,250))
+        screen.blit(text_record, (30,300))
+        pygame.display.update()
+
+
+drawing_intro()
 drawing_interface(score)
 pygame.display.update()
 while is_zero(mas) and is_can_move(mas):
@@ -252,13 +328,17 @@ while is_zero(mas) and is_can_move(mas):
             elif event.key == pygame.K_DOWN:
                 mas,count = move_down(mas)
             score += count
-            empty = get_empty_list(mas)
-            shuffle(empty)
-            num = empty.pop()
-            x,y = get_ind_from_num(num)
-            mas = two_or_four(mas,x,y)
-            drawing_interface(score)
+            if is_zero(mas):
+                empty = get_empty_list(mas)
+                shuffle(empty)
+                num = empty.pop()
+                x,y = get_ind_from_num(num)
+                mas = two_or_four(mas,x,y)
+                drawing_interface(score)
             pygame.display.update()
+    print(USERNAME)
+
+drawing_game_over()
 
 
 
