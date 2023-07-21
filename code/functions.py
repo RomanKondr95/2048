@@ -1,4 +1,5 @@
 from random import *
+from copy import deepcopy
 def get_num_from_ind(i,j) -> int:
     """
     функция получает число по индексу массива
@@ -39,6 +40,7 @@ def move_left(mas):
     функция обрабатывает движение влево
 
     """
+    origin = deepcopy(mas)
     count = 0
     for row in mas:
         while 0 in row:
@@ -52,13 +54,14 @@ def move_left(mas):
                 count += mas[i][j]
                 mas[i].pop(j+1)
                 mas[i].append(0)
-    return mas,count
+    return mas,count,not origin == mas
 
 def move_right(mas):
     """
     функция обрабатывает движение вправо
 
     """
+    origin = deepcopy(mas)
     count = 0
     for row in mas:
         while 0 in row:
@@ -72,13 +75,14 @@ def move_right(mas):
                 count += mas[i][j]
                 mas[i].pop(j-1)
                 mas[i].insert(0,0)
-    return mas,count
+    return mas,count,not origin == mas
 
 def move_up(mas):
     """
     функция обрабатывает движение вверх
 
     """
+    origin = deepcopy(mas)
     count = 0
     for j in range(4):
         col = []
@@ -95,13 +99,14 @@ def move_up(mas):
                 col.append(0)
         for i in range(4):
             mas[i][j] = col[i]
-    return mas,count
+    return mas,count,not origin == mas
 
 def move_down(mas):
     """
     функция обрабатывает движение вниз
 
     """
+    origin = deepcopy(mas)
     count = 0
     for j in range(4):
         col = []
@@ -118,7 +123,7 @@ def move_down(mas):
                 col.insert(0,0)
         for i in range(4):
             mas[i][j] = col[i]
-    return mas,count
+    return mas,count,not origin == mas
 
 def is_can_move(mas):
     """
@@ -128,7 +133,7 @@ def is_can_move(mas):
         for j in range(3):
             if mas[i][j] == mas[i][j+1] or mas[i][j] == mas[i+1][j] or mas[i][j] == mas[i][j-1] or mas[i][j] == mas[i-1][j]:
                 return True
-    return False
+    return mas[3][3] == mas[3][2] or mas[3][3]==mas[2][3]
 
 def two_or_four(mas,x,y)->list:
     """

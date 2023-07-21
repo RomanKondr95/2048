@@ -1,4 +1,4 @@
-from game import *
+from functions import *
 import unittest
 class Test_2048(unittest.TestCase):
     def test_1(self):

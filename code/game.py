@@ -8,15 +8,15 @@ GAMERS_DB = get_best()
 USERNAME = None
 
 def drawing_top():
-    font_top = pygame.font.SysFont('stxingkai',30)
-    font_gamer = pygame.font.SysFont('arial',20)
+    font_top = pygame.font.SysFont('comicsansms',30)
+    font_gamer = pygame.font.SysFont('comicsansms',17)
     text_head = font_top.render('Best tries: ', True, BLACK)
-    screen.blit(text_head, (350,5))
+    screen.blit(text_head, (320,2))
     for index, gamer in enumerate(GAMERS_DB):
         name, score = gamer
         s = f'{index+1}. {name} - {score}'
         text_gamer = font_gamer.render(s, True, BLACK)
-        screen.blit(text_gamer, (350, 33 + 20 * index))
+        screen.blit(text_gamer, (320, 35 + 25 * index))
     
 
 
@@ -26,11 +26,11 @@ def drawing_interface(score):
 
     """
     pygame.draw.rect(screen,(222, 184, 135),title_rec)
-    font = pygame.font.SysFont('arial', 70)
-    font_score = pygame.font.SysFont('stxingkai',70)
+    font = pygame.font.SysFont('comicsansms', 70)
+    font_score = pygame.font.SysFont('comicsansms',55)
     text_score = font_score.render('Score: ', True, BLACK)
     text_score_value = font_score.render(f'{score}', True, BLACK)
-    screen.blit(text_score,(20,35))
+    screen.blit(text_score,(15,35))
     screen.blit(text_score_value,(200,35))
     pretty_mas(mas)
     drawing_top()
@@ -108,9 +108,9 @@ def drawing_intro():
 
     """
     img = pygame.image.load('images.jpg')
-    font_welcome = pygame.font.SysFont('stxingkai',50)
-    font_name = pygame.font.SysFont('arial',50)
-    text_welcome = font_welcome.render('WELCOME!',True,(255,0,0))
+    font_welcome = pygame.font.SysFont('comicsansms',40)
+    font_name = pygame.font.SysFont('comicsansms',50)
+    text_welcome = font_welcome.render('WELCOME!',True,(250,0,0))
     name = 'Enter your name'
     is_find_name = False
     while not is_find_name:
@@ -150,11 +150,11 @@ def drawing_game_over():
     функция обрабатывает конечную звставку
 
     """
-    global USERNAME
+    global USERNAME,mas,score,GAMERS_DB
     img = pygame.image.load('img.jpg')
-    font_game_over = pygame.font.SysFont('stxingkai',50)
+    font_game_over = pygame.font.SysFont('comicsansms',40)
     font_score = pygame.font.SysFont('arial',50)
-    text_game_over = font_game_over.render('Fucking loser!', True, (255,0,0))
+    text_game_over = font_game_over.render('Fucking loser!', True, (220,0,0))
     text_score = font_score.render(f'Your score: {score}', True, (255,255,255))
     best_score = GAMERS_DB[0][1]
     if score > best_score:
@@ -162,7 +162,8 @@ def drawing_game_over():
     else:
         text = f'Record still {best_score}'
     text_record = font_score.render(text,True,(255, 165, 0))
-    insert_res(USERNAME,score)    
+    insert_res(USERNAME,score)
+    GAMERS_DB = get_best()    
     desicion = False
     while not desicion:
         for event in pygame.event.get():
@@ -179,10 +180,10 @@ def drawing_game_over():
                     init_const()
 
         screen.fill(BLACK)
-        screen.blit(text_game_over,(230,80))
+        screen.blit(text_game_over,(215,80))
         screen.blit(pygame.transform.scale(img,[210,210]),[5,5])
         screen.blit(text_score,(30,250))
-        screen.blit(text_record, (30,300))
+        screen.blit(text_record, (30,320))
         pygame.display.update()
     screen.fill(BLACK)
 def game_loop():
@@ -192,6 +193,7 @@ def game_loop():
     global score,mas
     drawing_interface(score)
     pygame.display.update()
+    is_mas_move = False
     while is_zero(mas) and is_can_move(mas):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -200,21 +202,22 @@ def game_loop():
             elif event.type == pygame.KEYDOWN:
                 count = 0
                 if event.key == pygame.K_LEFT:
-                    mas,count = move_left(mas)
+                    mas,count,is_mas_move = move_left(mas)
                 elif event.key == pygame.K_RIGHT:
-                    mas,count = move_right(mas)
+                    mas,count,is_mas_move = move_right(mas)
                 elif event.key == pygame.K_UP:
-                    mas,count = move_up(mas)
+                    mas,count,is_mas_move = move_up(mas)
                 elif event.key == pygame.K_DOWN:
-                    mas,count = move_down(mas)
+                    mas,count,is_mas_move = move_down(mas)
                 score += count
-                if is_zero(mas):
+                if is_zero(mas) and is_mas_move:
                     empty = get_empty_list(mas)
                     shuffle(empty)
                     num = empty.pop()
                     x,y = get_ind_from_num(num)
                     mas = two_or_four(mas,x,y)
                     drawing_interface(score)
+                    is_mas_move = False
                 pygame.display.update()
         print(USERNAME)
 
