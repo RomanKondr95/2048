@@ -3,9 +3,10 @@ import pygame
 import sys
 from database import get_best,cur,insert_res
 from functions import *
+import json
+import os
 
 GAMERS_DB = get_best()
-USERNAME = None
 
 def drawing_top():
     font_top = pygame.font.SysFont('comicsansms',30)
@@ -64,10 +65,21 @@ def init_const():
     x2,y2 = get_ind_from_num(num2)
     mas = two_or_four(mas,x2,y2)
     score = 0
-
+USERNAME = None
 mas = None
 score = None
-init_const()
+path = os.getcwd()
+if 'data.txt' in os.listdir(path):
+    with open('data.txt') as file:
+        data = json.load(file)
+        USERNAME = data['user']
+        mas = data['mas']
+        score = data['score']
+    full_path = os.path.join(path,'data.txt')
+    os.remove(full_path)
+else:
+    init_const()
+
 SILVER =(192,192,192)
 BLACK = (0,0,0)
 COLORS = {
@@ -101,6 +113,19 @@ def pretty_mas(mas)->list:
 pygame.init()
 screen = pygame.display.set_mode((widht,height))
 pygame.display.set_caption('2048')
+
+def save_game():
+    """
+    функция позволяет сохранить данные в json
+    """
+    data = {
+        'user': USERNAME,
+        'mas': mas,
+        'score': score
+    }
+    with open('data.txt','w') as file:
+        json.dump(data,file)
+
 
 def drawing_intro():
     """
@@ -197,6 +222,7 @@ def game_loop():
     while is_zero(mas) and is_can_move(mas):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                save_game()
                 pygame.quit()
                 sys.exit(0)
             elif event.type == pygame.KEYDOWN:
